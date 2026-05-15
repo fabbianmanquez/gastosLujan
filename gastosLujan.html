@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gastos Compartidos</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --pink:       #D4537E;
+      --pink-dark:  #993556;
+      --pink-deep:  #72243E;
+      --pink-light: #FBEAF0;
+      --pink-mid:   #F4C0D1;
+      --pink-soft:  #ED93B1;
+      --bg:         #ffffff;
+      --bg2:        #fdf5f8;
+      --bg3:        #faeef4;
+      --text:       #1a1a1a;
+      --text2:      #666;
+      --radius:     8px;
+      --radius-lg:  12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:        #1e1a1c;
+        --bg2:       #2a1f24;
+        --bg3:       #332028;
+        --text:      #f5eef1;
+        --text2:     #b89aa6;
+        --pink-light:#3a1525;
+        --pink-mid:  #6b2a42;
+        --pink-deep: #F4C0D1;
+        --pink-dark: #ED93B1;
+      }
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg3);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2rem 1rem 5rem;
+    }
+    .app { max-width: 600px; margin: 0 auto; }
+
+    .header { margin-bottom: 1.75rem; text-align: center; }
+    .header h1 { font-size: 26px; font-weight: 600; color: var(--pink-deep); margin-bottom: 4px; }
+    .header p  { font-size: 14px; color: var(--pink-dark); }
+
+    .step {
+      background: var(--bg);
+      border: 0.5px solid var(--pink-mid);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .step-title {
+      font-size: 15px; font-weight: 500; color: var(--pink-deep);
+      margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;
+    }
+    .step-num {
+      background: var(--pink-light); border-radius: 50%;
+      width: 26px; height: 26px; display: flex; align-items: center;
+      justify-content: center; font-size: 12px; font-weight: 500;
+      color: var(--pink-dark); flex-shrink: 0;
+    }
+
+    .add-row { display: flex; gap: 8px; }
+    .add-row input {
+      flex: 1; padding: 9px 12px;
+      border: 0.5px solid var(--pink-mid); border-radius: var(--radius);
+      background: var(--bg); color: var(--text); font-size: 14px; outline: none;
+    }
+    .add-row input:focus { border-color: var(--pink); box-shadow: 0 0 0 2px var(--pink-light); }
+    .add-row input::placeholder { color: var(--pink-soft); }
+
+    .btn-pink {
+      padding: 9px 16px; background: var(--pink); border: none;
+      border-radius: var(--radius); color: white; font-size: 13px;
+      font-weight: 500; cursor: pointer; white-space: nowrap;
+    }
+    .btn-pink:hover { background: var(--pink-dark); }
+
+    .participants-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; min-height: 8px; }
+    .p-chip {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 8px 6px 12px;
+      background: var(--pink-light); border: 0.5px solid var(--pink-mid);
+      border-radius: 20px; font-size: 13px; color: var(--pink-deep);
+    }
+    .p-chip button {
+      background: none; border: none; color: var(--pink-soft);
+      cursor: pointer; font-size: 16px; line-height: 1; padding: 0;
+      display: flex; align-items: center;
+    }
+    .p-chip button:hover { color: var(--pink-dark); }
+
+    .hint { font-size: 12px; color: var(--pink-soft); margin-top: 10px; }
+
+    .amounts-grid { display: grid; gap: 10px; }
+    .amt-row { display: grid; grid-template-columns: 1fr 145px; gap: 8px; align-items: center; }
+    .amt-label { font-size: 14px; color: var(--text); display: flex; align-items: center; gap: 9px; }
+    .avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--pink-light); display: flex; align-items: center;
+      justify-content: center; font-size: 11px; font-weight: 600;
+      color: var(--pink-dark); flex-shrink: 0;
+    }
+    .amt-input { display: flex; align-items: center; gap: 6px; }
+    .amt-input span { font-size: 13px; color: var(--pink-soft); }
+    .amt-input input {
+      width: 100%; padding: 8px 10px;
+      border: 0.5px solid var(--pink-mid); border-radius: var(--radius);
+      background: var(--bg); color: var(--text); font-size: 14px; outline: none;
+    }
+    .amt-input input:focus { border-color: var(--pink); box-shadow: 0 0 0 2px var(--pink-light); }
+
+    .ge-card {
+      background: var(--pink-light); border-radius: var(--radius);
+      padding: 12px; margin-bottom: 10px; border: 0.5px solid var(--pink-mid);
+    }
+    .ge-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .ge-top span { font-size: 13px; font-weight: 500; color: var(--pink-deep); }
+    .ge-card label { font-size: 12px; color: var(--pink-dark); display: block; margin-top: 10px; margin-bottom: 4px; }
+    .ge-card input {
+      width: 100%; padding: 8px 10px;
+      border: 0.5px solid var(--pink-mid); border-radius: var(--radius);
+      background: var(--bg); color: var(--text); font-size: 14px; outline: none;
+    }
+    .ge-card input:focus { border-color: var(--pink); }
+
+    .pax-header { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; margin-bottom: 6px; }
+    .pax-header label { font-size: 12px; color: var(--pink-dark); margin: 0; }
+    .btn-clear {
+      background: none; border: none; font-size: 11px;
+      color: var(--pink-soft); cursor: pointer; padding: 2px 8px; border-radius: 4px;
+    }
+    .btn-clear:hover { color: var(--pink-dark); background: var(--pink-mid); }
+
+    .pax-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pax-chip {
+      padding: 5px 12px; border: 1.5px solid var(--pink-mid);
+      border-radius: 20px; background: var(--bg); color: var(--pink-dark);
+      cursor: pointer; font-size: 12px; user-select: none; transition: all 0.1s;
+    }
+    .pax-chip:hover { border-color: var(--pink); color: var(--pink-deep); }
+    .pax-chip.on { background: var(--pink); border-color: var(--pink); color: white; font-weight: 500; }
+
+    .pax-summary {
+      margin-top: 8px; padding: 8px 10px;
+      background: var(--bg); border-radius: var(--radius);
+      border: 0.5px solid var(--pink-mid);
+    }
+    .pax-summary .lbl { font-size: 11px; color: var(--pink-dark); margin-bottom: 4px; }
+    .pax-summary .names { font-size: 13px; font-weight: 500; color: var(--pink-deep); line-height: 1.5; }
+    .pax-summary .empty { font-size: 13px; color: var(--pink-soft); font-style: italic; }
+    .pax-count {
+      display: inline-block; background: var(--pink-mid); color: var(--pink-deep);
+      border-radius: 20px; font-size: 11px; font-weight: 500; padding: 1px 7px; margin-left: 5px;
+    }
+
+    .btn-add-ge {
+      padding: 9px 14px; border: 0.5px dashed var(--pink-mid);
+      border-radius: var(--radius); background: transparent;
+      color: var(--pink-dark); cursor: pointer; font-size: 13px; width: 100%;
+    }
+    .btn-add-ge:hover { background: var(--pink-light); }
+
+    .btn-rm { background: none; border: none; color: var(--pink-soft); cursor: pointer; font-size: 20px; line-height: 1; padding: 0 2px; }
+    .btn-rm:hover { color: var(--pink-dark); }
+
+    .btn-calc {
+      padding: 13px; background: var(--pink); border: none;
+      border-radius: var(--radius); color: white; font-size: 15px;
+      font-weight: 500; cursor: pointer; width: 100%; margin-top: 0.5rem;
+    }
+    .btn-calc:hover { background: var(--pink-dark); }
+
+    .err {
+      font-size: 13px; margin-top: 8px; padding: 9px 12px;
+      border-radius: var(--radius); display: none;
+      color: var(--pink-deep); background: var(--pink-mid);
+    }
+
+    .resultado {
+      background: var(--bg); border: 0.5px solid var(--pink-mid);
+      border-radius: var(--radius-lg); padding: 1.25rem; margin-top: 1rem;
+    }
+    .res-title { font-size: 16px; font-weight: 500; margin-bottom: 1rem; color: var(--pink-deep); }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 1rem; }
+    .stat { background: var(--pink-light); border-radius: var(--radius); padding: 10px; }
+    .stat .lbl { font-size: 11px; color: var(--pink-dark); margin-bottom: 4px; }
+    .stat .val { font-size: 17px; font-weight: 500; color: var(--pink-deep); }
+
+    .sec-title {
+      font-size: 12px; font-weight: 500; color: var(--pink-dark);
+      text-transform: uppercase; letter-spacing: .05em; margin: 1rem 0 6px;
+    }
+    .ge-result {
+      padding: 9px 12px; background: var(--pink-light);
+      border-radius: var(--radius); margin-bottom: 6px; font-size: 13px; color: var(--pink-deep);
+    }
+    .tx {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 12px; background: var(--pink-light);
+      border-radius: var(--radius); margin-bottom: 6px;
+      font-size: 14px; flex-wrap: wrap;
+    }
+    .tx .from { font-weight: 500; color: var(--text); }
+    .tx .arrow { color: var(--pink-soft); font-size: 16px; }
+    .tx .to   { font-weight: 500; color: var(--pink-deep); }
+    .tx .amt  { margin-left: auto; font-weight: 600; color: var(--pink); }
+
+    .copy-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 16px; border: 0.5px solid var(--pink-mid);
+      border-radius: var(--radius); background: transparent;
+      color: var(--pink-dark); cursor: pointer; font-size: 13px; margin-top: 1rem;
+    }
+    .copy-btn:hover { background: var(--pink-light); }
+
+    .btn-reset {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: none; border: 0.5px solid var(--pink-mid);
+      border-radius: var(--radius); color: var(--pink-dark);
+      cursor: pointer; font-size: 12px; padding: 7px 12px; margin-top: 10px; margin-left: 8px;
+    }
+    .btn-reset:hover { background: var(--pink-light); }
+
+    .badge-ok {
+      display: inline-block; background: var(--pink-light); color: var(--pink-deep);
+      border-radius: var(--radius); font-size: 13px; padding: 9px 14px;
+      border: 0.5px solid var(--pink-mid);
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .amt-row { grid-template-columns: 1fr 120px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>💸 Gastos compartidos</h1>
+    <p>Agregá participantes y calculamos quién le debe a quién.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-title"><span class="step-num">1</span>¿Quiénes participaron?</div>
+    <div class="add-row">
+      <input type="text" id="inp-name" placeholder="Nombre del participante..." maxlength="30" autocomplete="off">
+      <button class="btn-pink" id="btn-add-p">
+        <i class="ti ti-plus"></i> Agregar
+      </button>
+    </div>
+    <div class="participants-list" id="plist"></div>
+    <p class="hint" id="hint1">Agregá al menos 2 participantes para continuar.</p>
+    <div class="err" id="e1">Agregá al menos 2 participantes.</div>
+  </div>
+
+  <div class="step">
+    <div class="step-title"><span class="step-num">2</span>¿Cuánto gastó cada uno?</div>
+    <div class="amounts-grid" id="ag"></div>
+    <p class="hint">Ingresá 0 si alguien no gastó nada.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-title">
+      <span class="step-num">3</span>
+      Gastos específicos
+      <span style="font-size:12px;font-weight:400;color:var(--pink-soft);margin-left:2px">(opcional)</span>
+    </div>
+    <p style="font-size:13px;color:var(--pink-dark);margin-bottom:10px">
+      Gastos que se dividen solo entre algunos. Ej: Uber, botella, entradas, etc.
+    </p>
+    <div id="gel"></div>
+    <button class="btn-add-ge" id="badd">
+      <i class="ti ti-plus"></i> Agregar gasto específico
+    </button>
+    <div class="err" id="e3">Completá el monto y seleccioná al menos 1 participante en cada gasto.</div>
+  </div>
+
+  <button class="btn-calc" id="bcalc">
+    <i class="ti ti-calculator"></i> Calcular cuentas
+  </button>
+
+  <div id="out"></div>
+</div>
+
+<script>
+(function () {
+  var participants = [];
+  var ges = [];
+  var gid = 0;
+
+  function fmt(n) { return '$' + (Math.round(n * 100) / 100).toFixed(2); }
+
+  function initials(name) {
+    var parts = name.trim().split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return name.substring(0, 2).toUpperCase();
+  }
+
+  function renderParticipants() {
+    var list = document.getElementById('plist');
+    list.innerHTML = '';
+    participants.forEach(function (p) {
+      var chip = document.createElement('div');
+      chip.className = 'p-chip';
+      var label = document.createElement('span');
+      label.textContent = p;
+      var rm = document.createElement('button');
+      rm.innerHTML = '&times;';
+      rm.title = 'Quitar';
+      rm.addEventListener('click', function () {
+        participants = participants.filter(function (x) { return x !== p; });
+        ges.forEach(function (ge) {
+          ge.pax = ge.pax.filter(function (x) { return x !== p; });
+          renderPax(ge);
+        });
+        renderParticipants();
+        renderAmounts();
+      });
+      chip.appendChild(label);
+      chip.appendChild(rm);
+      list.appendChild(chip);
+    });
+    var hint = document.getElementById('hint1');
+    if (participants.length === 0) hint.textContent = 'Agregá al menos 2 participantes para continuar.';
+    else if (participants.length === 1) hint.textContent = 'Falta al menos 1 participante más.';
+    else hint.textContent = participants.length + ' participantes listos.';
+    renderAmounts();
+  }
+
+  function addParticipant() {
+    var inp = document.getElementById('inp-name');
+    var name = inp.value.trim();
+    if (!name) return;
+    if (participants.indexOf(name) >= 0) { inp.select(); return; }
+    participants.push(name);
+    inp.value = '';
+    inp.focus();
+    document.getElementById('e1').style.display = 'none';
+    renderParticipants();
+    ges.forEach(function (ge) { renderPax(ge); });
+  }
+
+  document.getElementById('btn-add-p').addEventListener('click', addParticipant);
+  document.getElementById('inp-name').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); addParticipant(); }
+  });
+
+  function renderAmounts() {
+    var ag = document.getElementById('ag');
+    var prev = {};
+    ag.querySelectorAll('input[data-f]').forEach(function (inp) { prev[inp.getAttribute('data-f')] = inp.value; });
+    ag.innerHTML = '';
+    participants.forEach(function (f) {
+      var row = document.createElement('div');
+      row.className = 'amt-row';
+      var lbl = document.createElement('div');
+      lbl.className = 'amt-label';
+      var av = document.createElement('div');
+      av.className = 'avatar';
+      av.textContent = initials(f);
+      lbl.appendChild(av);
+      lbl.appendChild(document.createTextNode(f));
+      var wrap = document.createElement('div');
+      wrap.className = 'amt-input';
+      var sign = document.createElement('span');
+      sign.textContent = '$';
+      var inp = document.createElement('input');
+      inp.type = 'number'; inp.min = '0'; inp.step = 'any'; inp.placeholder = '0';
+      inp.setAttribute('data-f', f);
+      inp.value = prev[f] || '';
+      wrap.appendChild(sign);
+      wrap.appendChild(inp);
+      row.appendChild(lbl);
+      row.appendChild(wrap);
+      ag.appendChild(row);
+    });
+  }
+
+  function updateSummary(ge) {
+    var el = document.getElementById('summary_' + ge.id);
+    if (!el) return;
+    if (ge.pax.length === 0) {
+      el.innerHTML = '<div class="lbl">Seleccionados</div><div class="empty">Ninguno — tocá los nombres arriba</div>';
+    } else {
+      el.innerHTML = '<div class="lbl">Seleccionados <span class="pax-count">' + ge.pax.length + '</span></div><div class="names">' + ge.pax.join(' · ') + '</div>';
+    }
+  }
+
+  function renderPax(ge) {
+    var wrap = document.getElementById('pax_' + ge.id);
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    participants.forEach(function (f) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pax-chip' + (ge.pax.indexOf(f) >= 0 ? ' on' : '');
+      btn.textContent = f;
+      btn.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        var idx = ge.pax.indexOf(f);
+        if (idx >= 0) { ge.pax.splice(idx, 1); btn.className = 'pax-chip'; }
+        else { ge.pax.push(f); btn.className = 'pax-chip on'; }
+        updateSummary(ge);
+        document.getElementById('e3').style.display = 'none';
+      });
+      wrap.appendChild(btn);
+    });
+    updateSummary(ge);
+  }
+
+  function addGE() {
+    gid++;
+    var ge = { id: gid, pax: [] };
+    ges.push(ge);
+
+    var card = document.createElement('div');
+    card.className = 'ge-card'; card.id = 'ge_' + ge.id;
+
+    var top = document.createElement('div'); top.className = 'ge-top';
+    var title = document.createElement('span'); title.textContent = 'Gasto específico #' + gid;
+    var rm = document.createElement('button'); rm.type = 'button'; rm.className = 'btn-rm'; rm.innerHTML = '&times;';
+    rm.addEventListener('click', function () { ges = ges.filter(function (g) { return g.id !== ge.id; }); card.remove(); });
+    top.appendChild(title); top.appendChild(rm); card.appendChild(top);
+
+    var l1 = document.createElement('label'); l1.textContent = 'Descripción';
+    var i1 = document.createElement('input'); i1.type = 'text'; i1.id = 'desc_' + ge.id; i1.placeholder = 'Ej: Uber, botella, entradas...';
+
+    var l2 = document.createElement('label'); l2.textContent = 'Monto total $';
+    var i2 = document.createElement('input'); i2.type = 'number'; i2.id = 'monto_' + ge.id; i2.min = '0'; i2.step = 'any'; i2.placeholder = '0';
+
+    var ph = document.createElement('div'); ph.className = 'pax-header';
+    var l3 = document.createElement('label'); l3.textContent = 'Participantes';
+    var cl = document.createElement('button'); cl.type = 'button'; cl.className = 'btn-clear'; cl.textContent = 'Limpiar selección';
+    cl.addEventListener('click', function () { ge.pax = []; renderPax(ge); });
+    ph.appendChild(l3); ph.appendChild(cl);
+
+    var pw = document.createElement('div'); pw.className = 'pax-wrap'; pw.id = 'pax_' + ge.id;
+    var sm = document.createElement('div'); sm.className = 'pax-summary'; sm.id = 'summary_' + ge.id;
+
+    card.appendChild(l1); card.appendChild(i1);
+    card.appendChild(l2); card.appendChild(i2);
+    card.appendChild(ph); card.appendChild(pw); card.appendChild(sm);
+    document.getElementById('gel').appendChild(card);
+    renderPax(ge);
+  }
+
+  function calcular() {
+    document.getElementById('e1').style.display = 'none';
+    document.getElementById('e3').style.display = 'none';
+
+    if (participants.length < 2) { document.getElementById('e1').style.display = 'block'; return; }
+
+    var geData = [];
+    for (var i = 0; i < ges.length; i++) {
+      var ge = ges[i];
+      var desc = document.getElementById('desc_' + ge.id).value || 'Sin nombre';
+      var monto = parseFloat(document.getElementById('monto_' + ge.id).value) || 0;
+      if (!monto || ge.pax.length < 1) { document.getElementById('e3').style.display = 'block'; return; }
+      geData.push({ desc: desc, monto: monto, pax: ge.pax.slice() });
+    }
+
+    var gastos = {};
+    participants.forEach(function (f) {
+      var inp = document.querySelector('input[data-f="' + f + '"]');
+      gastos[f] = parseFloat(inp ? inp.value : 0) || 0;
+    });
+
+    var totalGeneral = participants.reduce(function (s, f) { return s + gastos[f]; }, 0);
+    var totalEsp = geData.reduce(function (s, g) { return s + g.monto; }, 0);
+    var totalComun = totalGeneral - totalEsp;
+
+    if (totalComun < -0.01) {
+      showResult('<div class="resultado"><p style="color:var(--pink-dark)">Los gastos específicos superan el total general. Revisá los montos.</p></div>');
+      return;
+    }
+
+    var parteComun = participants.length > 0 ? totalComun / participants.length : 0;
+    var balance = {};
+    participants.forEach(function (f) { balance[f] = gastos[f] - parteComun; });
+    geData.forEach(function (g) {
+      var parte = g.monto / g.pax.length;
+      g.pax.forEach(function (p) { if (balance[p] !== undefined) balance[p] -= parte; });
+    });
+
+    var txs = minimizar(balance);
+
+    var html = '<div class="resultado"><div class="res-title">Resultado del evento</div>';
+    html += '<div class="stats-grid">';
+    html += '<div class="stat"><div class="lbl">Total gastado</div><div class="val">' + fmt(totalGeneral) + '</div></div>';
+    html += '<div class="stat"><div class="lbl">Gasto común</div><div class="val">' + fmt(Math.max(0, totalComun)) + '</div></div>';
+    html += '<div class="stat"><div class="lbl">Por persona</div><div class="val">' + fmt(parteComun) + '</div></div>';
+    html += '</div>';
+
+    if (geData.length > 0) {
+      html += '<div class="sec-title">Gastos específicos</div>';
+      geData.forEach(function (g) {
+        var pp = g.monto / g.pax.length;
+        html += '<div class="ge-result"><strong>' + g.desc + '</strong> — ' + fmt(g.monto) + ' ÷ ' + g.pax.join(', ') + ' = ' + fmt(pp) + '/persona</div>';
+      });
+    }
+
+    html += '<div class="sec-title">Transferencias (' + txs.length + ')</div>';
+    if (txs.length === 0) {
+      html += '<div class="badge-ok"><i class="ti ti-check"></i> Todo balanceado — no hay transferencias necesarias</div>';
+    } else {
+      txs.forEach(function (t) {
+        html += '<div class="tx"><span class="from">' + t.from + '</span><span class="arrow">→</span><span class="to">' + t.to + '</span><span class="amt">' + fmt(t.amount) + '</span></div>';
+      });
+    }
+
+    var txt = 'GASTOS DEL EVENTO\n';
+    txt += 'Total: ' + fmt(totalGeneral) + ' | Común: ' + fmt(Math.max(0, totalComun)) + ' | Por persona: ' + fmt(parteComun) + '\n\n';
+    if (geData.length > 0) {
+      txt += 'GASTOS ESPECÍFICOS:\n';
+      geData.forEach(function (g) { txt += '- ' + g.desc + ': ' + fmt(g.monto) + ' ÷ ' + g.pax.join(', ') + '\n'; });
+      txt += '\n';
+    }
+    txt += 'TRANSFERENCIAS:\n';
+    if (txs.length === 0) txt += 'Todo balanceado, no hay transferencias.\n';
+    else txs.forEach(function (t) { txt += t.from + ' → ' + t.to + ': ' + fmt(t.amount) + '\n'; });
+
+    html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem">';
+    html += '<button class="copy-btn" id="cbtn"><i class="ti ti-copy"></i> Copiar para WhatsApp</button>';
+    html += '<button class="btn-reset" id="breset"><i class="ti ti-refresh"></i> Nuevo evento</button>';
+    html += '</div></div>';
+
+    showResult(html);
+
+    document.getElementById('cbtn').addEventListener('click', function () {
+      navigator.clipboard.writeText(txt).then(function () {
+        var b = document.getElementById('cbtn');
+        b.innerHTML = '<i class="ti ti-check"></i> ¡Copiado!';
+        setTimeout(function () { b.innerHTML = '<i class="ti ti-copy"></i> Copiar para WhatsApp'; }, 2000);
+      });
+    });
+
+    document.getElementById('breset').addEventListener('click', function () {
+      participants = []; ges = []; gid = 0;
+      document.getElementById('plist').innerHTML = '';
+      document.getElementById('ag').innerHTML = '';
+      document.getElementById('gel').innerHTML = '';
+      document.getElementById('out').innerHTML = '';
+      document.getElementById('hint1').textContent = 'Agregá al menos 2 participantes para continuar.';
+      document.getElementById('inp-name').value = '';
+      document.getElementById('inp-name').focus();
+    });
+  }
+
+  function showResult(html) {
+    var out = document.getElementById('out');
+    out.innerHTML = html;
+    out.style.display = 'block';
+    setTimeout(function () { out.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
+  }
+
+  function minimizar(bal) {
+    var EPS = 0.005, deben = [], reciben = [];
+    Object.keys(bal).forEach(function (p) {
+      var b = Math.round(bal[p] * 100) / 100;
+      if (b < -EPS) deben.push({ name: p, amt: -b });
+      else if (b > EPS) reciben.push({ name: p, amt: b });
+    });
+    deben.sort(function (a, b) { return b.amt - a.amt; });
+    reciben.sort(function (a, b) { return b.amt - a.amt; });
+    var result = [], i = 0, j = 0;
+    while (i < deben.length && j < reciben.length) {
+      var d = deben[i], a = reciben[j], t = Math.min(d.amt, a.amt);
+      if (t > EPS) result.push({ from: d.name, to: a.name, amount: Math.round(t * 100) / 100 });
+      d.amt -= t; a.amt -= t;
+      if (d.amt < EPS) i++;
+      if (a.amt < EPS) j++;
+    }
+    return result;
+  }
+
+  document.getElementById('badd').addEventListener('click', addGE);
+  document.getElementById('bcalc').addEventListener('click', calcular);
+})();
+</script>
+</body>
+</html>
